@@ -1,0 +1,53 @@
+HUMBLE REFACTOR REPORT
+Date: 2025-12-24
+
+Summary:
+The package failed to build on ROS 2 Humble due to references to the removed header and interface:
+  - fatal error: hardware_interface/base_interface.hpp: No such file or directory
+Humble removed the older BaseInterface wrapper API in favor of direct lifecycle-style
+`SystemInterface` callbacks.
+
+Changes made:
+1. Replaced `BaseInterface` usage with `hardware_interface::SystemInterface` lifecycle API.
+   - Removed inclusion of `hardware_interface/base_interface.hpp`.
+   - Added `rclcpp_lifecycle` lifecycle state includes where needed.
+2. Implemented lifecycle callbacks:
+   - `hardware_interface::CallbackReturn on_init(const HardwareInfo &)`
+   - `hardware_interface::CallbackReturn on_configure(const rclcpp_lifecycle::State &)`
+   - `hardware_interface::CallbackReturn on_activate(const rclcpp_lifecycle::State &)`
+   - `hardware_interface::CallbackReturn on_deactivate(const rclcpp_lifecycle::State &)`
+3. Updated `read` and `write` method signatures to match Humble:
+   - `hardware_interface::return_type read(const rclcpp::Time & time, const rclcpp::Duration & period)`
+   - `hardware_interface::return_type write(const rclcpp::Time & time, const rclcpp::Duration & period)`
+4. Replaced use of removed status header (`hardware_interface_status_values.hpp`) with
+   a small local enum `HwStatus { UNKNOWN, CONFIGURED, STARTED, STOPPED }` to preserve internal
+   status tracking. (This is intentionally minimal; consider using lifecycle state queries instead.)
+5. Kept plugin registration as before: `PLUGINLIB_EXPORT_CLASS(..., hardware_interface::SystemInterface)`.
+
+Files modified:
+- include/diffdrive_arduino/diffdrive_arduino.h
+- include/diffdrive_arduino/fake_robot.h
+- src/diffdrive_arduino.cpp
+- src/fake_robot.cpp
+
+Build & Tests:
+- Rebuilt the package with:
+    colcon build --packages-select diffdrive_arduino
+  Result: Build succeeded for `diffdrive_arduino`.
+
+Recommended next steps / TODOs:
+- Run runtime/launch tests to verify the hardware plugin activates and controllers start:
+    - Launch the robot hardware and controller stacks, activate lifecycle and verify read/write behavior.
+- Replace the local `HwStatus` with lifecycle-state-driven checks if you want to rely entirely on
+  the lifecycle API rather than a local enum.
+- Add an integration test or CI job that builds this package on Humble to prevent regressions.
+- Update README and package documentation to note Humble compatibility and lifecycle usage.
+- Prepare a short commit message: "Refactor: migrate hardware interface to ROS 2 Humble lifecycle API"
+
+Notes & caveats:
+- The refactor keeps functional behavior unchanged but changes initialization/activation flow to match
+  Humble's SystemInterface expectations.
+- If you later aim for forward compatibility with newer ROS 2 releases (or backport to older releases),
+  consider adding preprocessor guards or separate compatibility layers.
+
+If you'd like, I can prepare a ready-to-use git commit and a short changelog entry next.
