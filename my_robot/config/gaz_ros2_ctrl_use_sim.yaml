@@ -1,0 +1,7 @@
+# A standard Ros params file
+controller_manager:
+  ros__parameters:
+    # update_rate: 30 # original was 30
+    use_sim_time: true  # uncomment this line to use sim time in simulation only
+
+   
