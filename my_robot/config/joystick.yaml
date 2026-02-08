@@ -1,0 +1,30 @@
+joy_node:
+  ros__parameters:
+    device_id: 0
+    deadzone: 0.05
+    autorepeat_rate: 20.0
+
+teleop_node:
+  ros__parameters:
+    # twist messages are usually in 6 dimensions but we only utilize 2 (linear X and angular Z)
+    axis_linear:
+      x: 1 # axis index mapped from the controller
+    scale_linear:
+      x: 0.5
+    scale_linear_turbo:
+      x: 1.0
+
+    axis_angular:
+      yaw: 0 # axis index mapped from the controller to control rotation about z
+    scale_angular:
+      yaw: 0.5
+    scale_angular_turbo:
+      yaw: 1.0
+
+    # Setting up buttonf to enable regular and turbo mode (by default they are high active ==> only active when pressed)
+    enable_button: 6   # using LB for reguale mode     
+    enable_turbo_button: 7 # Using RB to switch to turbo
+
+    #explicitly enabling deadman's switch 
+    require_enable_button: true
+

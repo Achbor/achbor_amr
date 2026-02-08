@@ -10,19 +10,23 @@ slam_toolbox:
     ceres_loss_function: None
 
     # ROS Parameters
+    use_odometry: false
+    publish_tf: true
     odom_frame: odom
     map_frame: map
-    base_frame: base_footprint
+    base_frame: base_link
     scan_topic: /scan
     use_map_saver: true
-    mode: localization #localization
+    mode: mapping # can either be ampping or localization
+    #use_scan_matching: true # bypassing odometry data in map update and mapping
+    #use_sim_time: true
 
     # if you'd like to immediately start continuing a map at a given pose
     # or at the dock, but they are mutually exclusive, if pose is given
     # will use pose
-    map_file_name: /home/achy/ros2/ros2_robot/map_serial1
+    #map_file_name: /home/achy/ros2/ros2_robot/map_serial1
     # map_start_pose: [0.0, 0.0, 0.0]
-    map_start_at_dock: true
+    #map_start_at_dock: true
 
     debug_logging: false
     throttle_scans: 1

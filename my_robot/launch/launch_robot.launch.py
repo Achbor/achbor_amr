@@ -16,6 +16,23 @@ def generate_launch_description():
         )]), launch_arguments={'use_sim_time': 'false', 'use_ros2_control':'true'}.items() # Changed use_sim_time to false for real robot
     )
 
+    # # calling in Joystick controller launch file
+    # joystick = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource([os.path.join(
+    #         get_package_share_directory(package_name), 'launch', 'joystick.launch.py'
+    #     )]), launch_arguments={'use_sim_time':'true'}.items()
+    # )
+
+    # Adding in a Tist multiplexer launcher
+    twist_mux_params = os.path.join(get_package_share_directory(package_name), 'config', 'twist_mux.yaml')
+    twist_mux = Node(
+        package = 'twist_mux',
+        executable = 'twist_mux',
+        parameters = [twist_mux_params],
+        remappings = [('/cmd_vel_out', '/diff_cont/cmd_vel_unstamped')]
+    )
+
+
     # Include the gazebo launch file, Provided by the Gazebo ros package
     # gazebo_params_file = os.path.join(
     #     get_package_share_directory(package_name), 'config', 'gazebo_params.yaml'
@@ -47,7 +64,7 @@ def generate_launch_description():
         period = 3.0,
         actions=[controller_manager],    )
 
-    # Node to spawn teh differential drive controller
+    # Node to spawn teh differential drive controllerj
     diff_drive_spawner =Node(
         package="controller_manager",
         executable="spawner",
@@ -78,6 +95,7 @@ def generate_launch_description():
     # Return them all!
     return LaunchDescription([
         rsp,
+        twist_mux,
         delayed_controller_manager,
         delayed_diff_drive_spawner,
         delayed_joint_broad_spawner
