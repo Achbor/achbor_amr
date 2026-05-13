@@ -1,4 +1,5 @@
 AMR ROBOT
+
 This project encapsulates Autonomous Mobile Robot implementation. 
 The core implementation includes SLAM and Navigation ROS2 pakcages for 2d-map creation, localization and autonomous Navigation of the Robot.
 
